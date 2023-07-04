@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mapinha</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD0LcKmLnXGKmIH14ObWkv0Vq8mmHtUP9g&callback=initMap" async defer></script>
+</head>
+
+<body>
+  <div id="map"></div>
+  <header>
+    
+  </header>
+
+  <script>
+    let map;
+    let markers = [];
+
+    function initMap() {
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: -8.097368, lng: -34.962019 },
+        zoom: 12,
+      });
+
+      fetchMarkersFromDatabase();
+    }
+
+    window.initMap = initMap;
+
+    async function fetchMarkersFromDatabase() {
+      const response = await fetch('/api/markers');
+      const data = await response.json();
+
+      data.forEach(function (row) {
+        var latitude = parseFloat(row.latitude);
+        var longitude = parseFloat(row.longitude);
+        
+        if (!isNaN(latitude) && !isNaN(longitude)) {
+          if(row.alerta != null){
+          const marker = new google.maps.Marker({
+            position: { lat: latitude, lng: longitude },
+            map: map,
+          });
+            var infoContent = '';
+            infoContent += '<strong>ID:</strong> ' + row.id + '<br>';
+            infoContent += '<strong>Latitude:</strong> ' + row.latitude + '<br>';
+            infoContent += '<strong>Longitude:</strong> ' + row.longitude + '<br>';
+            infoContent += '<strong>Consumo Esperado:</strong> ' + row.consumo_esperado + '<br>';
+            infoContent += '<strong>Consumo Medido:</strong> ' + row.consumo_medido + '<br>';
+            infoContent += '<strong>Alerta:</strong> ' + row.alerta + '<br>';
+            infoContent += '<strong>Percentual de Variação:</strong> ' + row.percentual_variacao + '<br>';
+            var infoWindow = new google.maps.InfoWindow({
+              content: infoContent,
+            });
+            marker.addListener('click', function () {
+              infoWindow.open(map, marker);
+            });
+  
+            markers.push(marker);
+          }
+          
+        }
+      });
+    }
+
+    function clearMarkers() {
+      markers.forEach(function (marker) {
+        marker.setMap(null);
+      });
+      markers = [];
+    }
+  </script>
+</body>
+
+</html>

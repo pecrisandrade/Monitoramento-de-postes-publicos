@@ -1,0 +1,17 @@
+body {
+    margin: 0;
+    padding: 0;
+  }
+  
+  #map {
+    height: 100vh;
+  }
+  
+  
+  input[type="file"]::file-selector-button {
+    padding: 1px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
